@@ -1,0 +1,30 @@
+{
+  "state": {
+    "online": "Online",
+    "offline": "Offline",
+    "unavailable": "Indisponível"
+  },
+  "stat": {
+    "download": "Download",
+    "upload": "Upload",
+    "devices": "Dispositivos",
+    "clients_5g": "5 GHz",
+    "clients_24g": "2.4 GHz",
+    "mesh": "Nós mesh"
+  },
+  "action": {
+    "reboot": "Reiniciar",
+    "reboot_confirm": "Reiniciar o roteador agora? A conexão cai por ~1 minuto.",
+    "speedtest": "Teste de velocidade",
+    "wifi_24g": "Wi-Fi 2.4 GHz",
+    "wifi_5g": "Wi-Fi 5 GHz"
+  },
+  "led": {
+    "on": "LED de status ligado",
+    "off": "LED de status desligado"
+  },
+  "error": {
+    "no_entity": "Configuração de entidade obrigatória ausente",
+    "invalid_config": "Configuração inválida"
+  }
+}

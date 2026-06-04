@@ -1,0 +1,30 @@
+{
+  "state": {
+    "online": "Online",
+    "offline": "Offline",
+    "unavailable": "Unavailable"
+  },
+  "stat": {
+    "download": "Download",
+    "upload": "Upload",
+    "devices": "Devices",
+    "clients_5g": "5 GHz",
+    "clients_24g": "2.4 GHz",
+    "mesh": "Mesh nodes"
+  },
+  "action": {
+    "reboot": "Reboot",
+    "reboot_confirm": "Reboot the router now? Connectivity will drop for ~1 minute.",
+    "speedtest": "Run speed test",
+    "wifi_24g": "2.4 GHz Wi-Fi",
+    "wifi_5g": "5 GHz Wi-Fi"
+  },
+  "led": {
+    "on": "Status LED on",
+    "off": "Status LED off"
+  },
+  "error": {
+    "no_entity": "Missing required entity configuration",
+    "invalid_config": "Invalid configuration"
+  }
+}

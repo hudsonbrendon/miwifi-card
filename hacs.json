@@ -1,0 +1,6 @@
+{
+  "name": "MiWiFi Card",
+  "render_readme": true,
+  "filename": "miwifi-card.js",
+  "homeassistant": "2024.1.0"
+}
