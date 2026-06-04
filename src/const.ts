@@ -1,6 +1,6 @@
 export const CARD_NAME = "miwifi-card";
 export const EDITOR_NAME = `${CARD_NAME}-editor`;
-export const CARD_VERSION = "0.3.0";
+export const CARD_VERSION = "0.4.0";
 
 export const MIWIFI_PLATFORM = "ha_miwifi";
 
