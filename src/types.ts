@@ -47,8 +47,18 @@ export interface HassState {
   attributes: Record<string, unknown>;
 }
 
+// Subset of the HA frontend entity-registry display entry (`hass.entities`).
+// `platform` and `translation_key` are language-independent, unlike entity_id.
+export interface EntityRegistryEntry {
+  entity_id: string;
+  platform?: string;
+  translation_key?: string;
+  device_id?: string;
+}
+
 export interface HassObject {
   states: Record<string, HassState>;
+  entities?: Record<string, EntityRegistryEntry>;
   locale: { language: string };
   callService: (
     domain: string,

@@ -27,6 +27,13 @@ entity: redmi_ax6000
 name: Living Room Router
 ```
 
+**Works in any Home Assistant language.** Auto-resolve matches entities by the
+integration platform (`ha_miwifi`) and each entity's stable `translation_key`,
+not by the localized `entity_id`. So `entity: miwifi` works even when your HA is
+in Portuguese and the ids are `sensor.miwifi_velocidade_de_download` etc. — no
+override needed. (If the entity registry can't be read, it falls back to the
+English-name slug; use `entities:` overrides for any non-standard setup.)
+
 ### Options
 
 | Option | Type | Default | Description |

@@ -280,7 +280,7 @@ export class MiWiFiCard extends LitElement {
 
   render() {
     if (!this._config || !this.hass) return nothing;
-    const ents = resolveEntities(this._config);
+    const ents = resolveEntities(this._config, this.hass.entities);
     const unavailable = this._isAnyEssentialUnavailable(ents);
     const compact = this._config.compact ? "compact" : "";
     return html`
