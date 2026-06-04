@@ -7,7 +7,9 @@ Design and animation inspired by
 hero (pulsing Wi-Fi waves, blinking status LED, up/down data-flow particles),
 a live status line, a stats grid, and a toolbar of actions.
 
-![example](assets/example.png)
+<p align="center">
+  <img src="assets/example.png" alt="MiWiFi Card preview" width="400">
+</p>
 
 ## Installation (HACS)
 
