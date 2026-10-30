@@ -43,3 +43,24 @@ describe("setConfig", () => {
     ).toThrow(/at most 4/i);
   });
 });
+
+describe("sizing and editor", () => {
+  it("getGridOptions shrinks in compact mode", () => {
+    const c = el() as CardEl & { getGridOptions(): { rows: number; columns: number } };
+    c.setConfig({ type: `custom:${CARD_NAME}`, entity: "mw" });
+    expect(c.getGridOptions()).toMatchObject({ rows: 5, columns: 6 });
+    c.setConfig({ type: `custom:${CARD_NAME}`, entity: "mw", compact: true });
+    expect(c.getGridOptions().rows).toBe(3);
+  });
+
+  it("getConfigForm exposes an ha-form schema with labels", () => {
+    const Card = customElements.get(CARD_NAME) as unknown as {
+      getConfigForm(): { schema: Array<{ name: string }>; computeLabel(s: { name: string }): string };
+      getConfigElement?: unknown;
+    };
+    const form = Card.getConfigForm();
+    expect(form.schema.map((s) => s.name)).toContain("entity");
+    expect(form.computeLabel({ name: "name" })).toBe("Name");
+    expect(Card.getConfigElement).toBeUndefined();
+  });
+});

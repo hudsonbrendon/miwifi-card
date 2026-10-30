@@ -10,6 +10,10 @@ export const cardStyles = css`
     --mw-error: #d32f2f;
     display: block;
   }
+  :host([dark-mode]) {
+    --mw-divider: var(--divider-color, rgba(255, 255, 255, 0.12));
+    --mw-hover: var(--secondary-background-color, rgba(255, 255, 255, 0.06));
+  }
   ha-card {
     overflow: hidden;
     padding: 14px 14px 4px;

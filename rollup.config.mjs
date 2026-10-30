@@ -8,9 +8,9 @@ export default {
   input: "src/miwifi-card.ts",
   output: {
     file: "dist/miwifi-card.js",
-    format: "iife",
-    name: "MiWiFiCard",
+    format: "es",
     sourcemap: true,
+    inlineDynamicImports: true,
   },
   plugins: [
     resolve({ browser: true }),

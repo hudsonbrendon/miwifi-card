@@ -1,10 +1,9 @@
-import { LitElement, html, nothing, type TemplateResult } from "lit";
+import { LitElement, html, nothing, type PropertyValues, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { CARD_NAME, CARD_VERSION, EDITOR_NAME } from "./const";
+import { CARD_NAME, CARD_VERSION, MIWIFI_PLATFORM } from "./const";
 import { cardStyles } from "./styles";
-import "./editor";
 import { svgRouter } from "./assets/router-svg";
-import { resolveEntities } from "./helpers/resolve-entities";
+import { resolveEntities, suggestPrefix } from "./helpers/resolve-entities";
 import { computeStateLine } from "./helpers/compute-state-line";
 import { formatRate } from "./helpers/format-rate";
 import { formatStat } from "./helpers/format-stat";
@@ -24,7 +23,7 @@ console.info(
 );
 
 interface CustomCardWindow extends Window {
-  customCards?: Array<{ type: string; name: string; description: string; preview: boolean }>;
+  customCards?: Array<Record<string, unknown>>;
 }
 const w = window as CustomCardWindow;
 w.customCards = w.customCards || [];
@@ -33,6 +32,14 @@ w.customCards.push({
   name: "MiWiFi Card",
   description: "Card for Xiaomi/MiWiFi routers via the ha_miwifi integration",
   preview: false,
+  documentationURL: "https://github.com/hudsonbrendon/miwifi-card",
+  // Offer this card when the user picks the router's WAN link entity.
+  getEntitySuggestion: (hass: HassObject, entityId: string) => {
+    const entry = hass.entities?.[entityId];
+    if (!entry || entry.platform !== MIWIFI_PLATFORM || entry.translation_key !== "wan_link") return null;
+    const prefix = suggestPrefix(hass.entities!, entityId);
+    return prefix ? { config: { type: `custom:${CARD_NAME}`, entity: prefix } } : null;
+  },
 });
 
 @customElement(CARD_NAME)
@@ -42,8 +49,23 @@ export class MiWiFiCard extends LitElement {
   @property({ attribute: false }) hass?: HassObject;
   @state() private _config?: MiWiFiCardConfig;
 
-  static getConfigElement(): HTMLElement {
-    return document.createElement(EDITOR_NAME);
+  static getConfigForm() {
+    return {
+      schema: [
+        { name: "entity", required: true, selector: { text: {} } },
+        { name: "name", selector: { text: {} } },
+        { name: "image", selector: { text: {} } },
+        {
+          type: "grid",
+          name: "",
+          schema: [
+            { name: "compact", selector: { boolean: {} } },
+            { name: "language", selector: { select: { options: ["en", "pt-BR"], mode: "dropdown" } } },
+          ],
+        },
+      ],
+      computeLabel: (schema: { name: string }) => localize(`editor.${schema.name}`),
+    };
   }
 
   static getStubConfig(): { type: string; entity: string } {
@@ -70,9 +92,33 @@ export class MiWiFiCard extends LitElement {
     return 5;
   }
 
+  getGridOptions() {
+    return this._config?.compact
+      ? { columns: 6, rows: 3, min_columns: 4, min_rows: 3 }
+      : { columns: 6, rows: 5, min_columns: 4, min_rows: 4 };
+  }
+
+  protected willUpdate(changed: PropertyValues): void {
+    if (changed.has("hass")) {
+      this.toggleAttribute("dark-mode", Boolean(this.hass?.themes?.darkMode));
+    }
+  }
+
   private _stateOf(entityId: string): string {
     if (!entityId || !this.hass) return "unavailable";
     return this.hass.states[entityId]?.state ?? "unavailable";
+  }
+
+  // Locale-aware display of a plain state; falls back to the raw state.
+  private _displayState(entityId: string): string {
+    const stateObj = this.hass?.states[entityId];
+    const raw = stateObj?.state ?? "unavailable";
+    if (!stateObj || ["unavailable", "unknown"].includes(raw)) return "—";
+    try {
+      return this.hass?.formatEntityState?.(stateObj) ?? raw;
+    } catch {
+      return raw;
+    }
   }
 
   private _resolveLang(): string {
@@ -91,9 +137,8 @@ export class MiWiFiCard extends LitElement {
   private _renderHeader(ents: ResolvedEntities): TemplateResult {
     const down = formatRate(this._stateOf(ents.download_speed));
     const up = formatRate(this._stateOf(ents.upload_speed));
-    const devices = this._stateOf(ents.connected_devices);
     const ledOn = this._stateOf(ents.led) === "on";
-    const devicesText = ["unavailable", "unknown"].includes(devices) ? "—" : devices;
+    const devicesText = this._displayState(ents.connected_devices);
     return html`
       <div class="header">
         <div class="header-left">
@@ -173,14 +218,17 @@ export class MiWiFiCard extends LitElement {
       <div class="stats">
         ${stats.map((s) => {
           const raw = this._stateOf(s.entity);
+          const plain = !s.unit && !s.multiply && s.precision === undefined && !s.suffix;
           const formatted = s.rate
             ? formatRate(raw)
-            : formatStat(raw, {
-                unit: s.unit,
-                multiply: s.multiply,
-                precision: s.precision,
-                suffix: s.suffix,
-              });
+            : plain
+              ? this._displayState(s.entity)
+              : formatStat(raw, {
+                  unit: s.unit,
+                  multiply: s.multiply,
+                  precision: s.precision,
+                  suffix: s.suffix,
+                });
           const label = s.subtitle.startsWith("stat.") ? localize(s.subtitle, lang) : s.subtitle;
           return html`
             <div class="stat">
