@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { resolveEntities } from "../src/helpers/resolve-entities";
+import { resolveEntities, suggestPrefix } from "../src/helpers/resolve-entities";
 
 describe("resolveEntities", () => {
   it("builds entity_ids from a device prefix using domain+suffix", () => {
@@ -112,5 +112,19 @@ describe("resolveEntities with the entity registry (any HA language)", () => {
     };
     const r = resolveEntities({ type: "custom:miwifi-card", entity: "miwifi" }, registry);
     expect(r.download_speed).toBe("sensor.miwifi_velocidade_de_download");
+  });
+});
+
+describe("suggestPrefix", () => {
+  const reg = (ids: string[], platform = "ha_miwifi") =>
+    Object.fromEntries(ids.map((id) => [id, { entity_id: id, platform, device_id: "d1" }]));
+
+  it("returns the common device slug of all entities on the device", () => {
+    const r = reg(["binary_sensor.miwifi_link_wan", "sensor.miwifi_velocidade_de_download", "switch.miwifi_wi_fi_5_ghz"]);
+    expect(suggestPrefix(r, "binary_sensor.miwifi_link_wan")).toBe("miwifi");
+  });
+
+  it("ignores entities from other platforms", () => {
+    expect(suggestPrefix(reg(["sensor.x_y"], "mqtt"), "sensor.x_y")).toBeUndefined();
   });
 });

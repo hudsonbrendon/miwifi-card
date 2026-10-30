@@ -60,6 +60,8 @@ export interface HassObject {
   states: Record<string, HassState>;
   entities?: Record<string, EntityRegistryEntry>;
   locale: { language: string };
+  themes?: { darkMode?: boolean };
+  formatEntityState?: (stateObj: HassState, state?: string) => string;
   callService: (
     domain: string,
     service: string,
